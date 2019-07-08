@@ -22,7 +22,10 @@ class Element {
 
   get tag => _tag;
 
-  set tag(v) {
+  set tag(String v) {
+    if (v != null) {
+      v = v.toLowerCase();
+    }
     if (_root == null) {
       _tag = v;
       return;
