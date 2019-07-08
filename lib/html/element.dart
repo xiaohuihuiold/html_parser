@@ -203,7 +203,7 @@ class Element {
       if (classes?.contains(clazz) ?? false) {
         elements.add(element);
       }
-      elements += element?.getElementsByTag(tag);
+      elements += element?.getElementsByClass(tag);
     });
     return elements;
   }
