@@ -1,3 +1,5 @@
+import 'package:html_parser/exception/element_root_null_exception.dart';
+
 import 'document.dart';
 
 class Element {
@@ -168,5 +170,41 @@ class Element {
   void removeFromDocument() {
     _root.removeElement(this);
     _elements?.forEach((element) => element.removeFromDocument());
+  }
+
+  /// 根据id查找element
+  /// [id] id值
+  Element getElementById(String id) {
+    if (_root == null) {
+      throw ElementRootNullException('根节点为空');
+    }
+    return _root.getElementById(id);
+  }
+
+  /// 根据标签查找elements
+  /// [tag] 标签
+  List<Element> getElementsByTag(String tag) {
+    List<Element> elements = List();
+    _elements?.forEach((element) {
+      if (element.tag == tag) {
+        elements.add(element);
+      }
+      elements += element?.getElementsByTag(tag);
+    });
+    return elements;
+  }
+
+  /// 根据class查找elements
+  /// [clazz] 类名
+  List<Element> getElementsByClass(String clazz) {
+    List<Element> elements = List();
+    _elements?.forEach((element) {
+      List<String> classes = element.classes;
+      if (classes?.contains(clazz) ?? false) {
+        elements.add(element);
+      }
+      elements += element?.getElementsByTag(tag);
+    });
+    return elements;
   }
 }
