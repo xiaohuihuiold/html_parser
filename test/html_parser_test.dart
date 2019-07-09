@@ -299,7 +299,9 @@ List<int> testParser(Element parent, int index) {
   int i = index;
   for (; i < testHtml.length; i++) {
     String char = testHtml[i];
-    if (char == '<') {
+    if (char == '/' && testHtml[i + 1] == '>') {
+      return [i + 2, 0];
+    } else if (char == '<') {
       if (testHtml[i + 1] == '/') {
         i += 2;
         String tag = '';
