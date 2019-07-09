@@ -8,7 +8,10 @@ class Document {
 
   get root => _root;
 
-  set root(v) => _root = v;
+  set root(v) {
+    _root = v;
+    _root.root = this;
+  }
 
   // 文档所有id元素
   Map<String, Element> _elementById;
@@ -184,7 +187,7 @@ class Document {
     if (tag == null || _elementsByTag == null) {
       return List();
     }
-    return _elementsByTag[tag];
+    return _elementsByTag[tag.toLowerCase()];
   }
 
   /// 根据class查找element
@@ -194,5 +197,10 @@ class Document {
       return List();
     }
     return _elementsByClass[clazz];
+  }
+
+  /// 打印所有节点
+  void printAll() {
+    _root?.printAll();
   }
 }

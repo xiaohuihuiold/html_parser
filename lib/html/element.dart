@@ -165,7 +165,7 @@ class Element {
     id = _id;
     List<String> classes = this.classes;
     this._classes = null;
-    classes.forEach((clazz) => addClass(clazz));
+    classes?.forEach((clazz) => addClass(clazz));
     _elements?.forEach((element) => element.updateToDocument());
   }
 
@@ -187,6 +187,7 @@ class Element {
   /// 根据标签查找elements
   /// [tag] 标签
   List<Element> getElementsByTag(String tag) {
+    tag = tag?.toLowerCase();
     List<Element> elements = List();
     _elements?.forEach((element) {
       if (element.tag == tag) {
@@ -209,5 +210,28 @@ class Element {
       elements += element?.getElementsByClass(tag);
     });
     return elements;
+  }
+
+  /// 打印所有节点
+  /// [depth] 深度
+  void printAll([int depth]) {
+    if (depth == null) {
+      depth = 0;
+    }
+    print('${'-' * depth}${this.toString()}');
+    depth++;
+    _elements?.forEach((element) => element.printAll(depth));
+  }
+
+  @override
+  String toString() {
+    String id = this._id == null ? '' : 'id:${this._id}';
+    String clazz = this._classes == null ? '' : 'class:${this._classes}';
+    String str;
+    str = '($id|$clazz)';
+    if (id.isEmpty && clazz.isEmpty) {
+      str = '';
+    }
+    return '$tag $str';
   }
 }
