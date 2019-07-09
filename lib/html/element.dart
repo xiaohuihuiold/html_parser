@@ -226,9 +226,9 @@ class Element {
   @override
   String toString() {
     String id = this._id == null ? '' : 'id:${this._id}';
-    String clazz = this._classes == null ? '' : 'class:${this._classes}';
+    String clazz = this._classes == null ? '' : '${id==null?'':' '}class:${this._classes}';
     String str;
-    str = '($id|$clazz)';
+    str = '($id$clazz)';
     if (id.isEmpty && clazz.isEmpty) {
       str = '';
     }
