@@ -28,6 +28,7 @@ class XmlParser {
   /// 解析出element结构
   /// [parent] 父element
   /// [index] html下标
+  /// 返回[下标,状态]
   List<int> _parseElement(Element parent, int index) {
     int i = index;
     Element element;
