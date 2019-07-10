@@ -5,8 +5,6 @@ import 'package:html_parser/html/element.dart';
 import 'package:html_parser/html_parser.dart';
 
 String testHtml = '''
-
-<!DOCTYPE html>
 <html lang="en-us">
 <head>
   <script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-26406144-13"></script>
@@ -78,12 +76,20 @@ String testHtml = '''
         <input class="input" name="q" placeholder="Search Dart packages" autocomplete="on" autofocus="autofocus" />
         <button class="icon"></button>
       </form>
-      <没闭合>
+      <div>
+      <未闭合>
+      <未闭合>
+      <未闭合>
+      <未闭合>
+      <未闭合>
+      <未闭合>
       <div class="list-filters">
         <a class="filter " href="/flutter">Flutter</a>
         <a class="filter " href="/web">Web</a>
         <a class="filter -active" href="/">All</a>
       </div>
+      <未闭合>
+      <未闭合>
       <p class="text">Find and use packages to build <a href="/flutter">Flutter</a> and <a href="/web">web</a> apps with <a target="_blank" rel="noopener" href="https://dart.dev">Dart</a>.</p>
     </main>
   </div>
@@ -238,8 +244,12 @@ String testHtml = '''
   <a class="link" href="https://www.google.cn/intl/en/policies/terms/">Terms</a>
   <a class="link" href="https://www.google.cn/intl/en/policies/privacy/">Privacy</a>
   <a class="link" href="/help">Help</a>
-  <a class="link" href="/feed.atom"><img src="/static/img/atom-feed-icon-32x32.png?hash=6pve899f2ui9t0d7lnd9ljnh498u13b4" class="inline-icon" /></a>
-  <a class="link github_issue" href="https://github.com/dart-lang/pub-dev/issues/new">Report an issue with this site</a>
+  <a class="link" href="/feed.atom">
+  <img src="/static/img/atom-feed-icon-32x32.png?hash=6pve899f2ui9t0d7lnd9ljnh498u13b4" class="inline-icon" />
+  </a>
+  <a class="link github_issue" href="https://github.com/dart-lang/pub-dev/issues/new">
+  Report an issue with this site
+  </a>
 </footer>
 <script type="application/ld+json">
 {"@context":"http://schema.org","@type":"WebSite","url":"https://pub.flutter-io.cn/","potentialAction":{"@type":"SearchAction","target":"https://pub.flutter-io.cn/packages?q={search_term_string}","query-input":"required name=search_term_string"}}
@@ -252,10 +262,8 @@ String testHtml = '''
 
 void main() {
   test('html parser', () {
-    Element root = Element();
-    root.tag = 'root';
-    testParser(root, 0);
-    root?.printAll();
+    XmlParser xmlParser = XmlParser.html(testHtml);
+    xmlParser.document?.printAll();
   });
   test('dom test', () {
     XmlParser xmlParser = XmlParser.html(testHtml);

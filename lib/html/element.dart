@@ -64,6 +64,11 @@ class Element {
 
   get elements => _elements;
 
+  // 元素属性列表
+  Map<String, dynamic> _attributes;
+
+  get attributes => _attributes;
+
   /// 添加class
   /// [clazz] 元素类名
   int addClass(String clazz) {
@@ -97,6 +102,41 @@ class Element {
       _classes = null;
     }
     return _classes?.length;
+  }
+
+  /// 添加元素属性
+  /// [name] 属性名
+  /// [value] 值
+  int putAttribute(String name, dynamic value) {
+    if (_attributes == null) {
+      _attributes = Map();
+    }
+    _attributes[name] = value;
+    return _attributes.length;
+  }
+
+  /// 移除元素属性
+  /// [name] 属性名
+  int removeAttribute(String name) {
+    if (_attributes == null) {
+      return -1;
+    }
+    _attributes.remove(name);
+    return _attributes.length;
+  }
+
+  /// 查找元素属性
+  /// [name] 属性名
+  dynamic getAttribute(String name) {
+    if (_attributes == null) {
+      return null;
+    }
+    return _attributes[name];
+  }
+
+  /// 获取所有属性名
+  List<String> getAttributeNames() {
+    return _attributes?.keys;
   }
 
   /// 添加子元素到最后一个
@@ -226,7 +266,9 @@ class Element {
   @override
   String toString() {
     String id = this._id == null ? '' : 'id:${this._id}';
-    String clazz = this._classes == null ? '' : '${id==null?'':' '}class:${this._classes}';
+    String clazz = this._classes == null
+        ? ''
+        : '${id == null ? '' : ' '}class:${this._classes}';
     String str;
     str = '($id$clazz)';
     if (id.isEmpty && clazz.isEmpty) {
