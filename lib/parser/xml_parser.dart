@@ -1,4 +1,5 @@
 import 'package:html_parser/exception/html_empty_exception.dart';
+import 'package:html_parser/exception/element_tag_null_exception.dart';
 import 'package:html_parser/html/document.dart';
 import 'package:html_parser/html/element.dart';
 
@@ -21,6 +22,7 @@ class XmlParser {
     }
     _document = Document();
     Element root = Element();
+    root.tag = 'root';
     _document.root = root;
     _parseElement(root, 0);
   }
@@ -69,6 +71,9 @@ class XmlParser {
           while (test.tag != temp.tag) {
             temp = temp.parent;
             num++;
+            if (temp == null) {
+              break;
+            }
           }
           return [i, num];
         }

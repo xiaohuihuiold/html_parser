@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:html_parser/html/document.dart';
 import 'package:html_parser/html/element.dart';
@@ -262,7 +264,7 @@ String testHtml = '''
 
 void main() {
   test('html parser', () {
-    XmlParser xmlParser = XmlParser.html(testHtml);
+    XmlParser xmlParser = XmlParser.html(File('examples/simple_parser/assets/test.html').readAsStringSync());
     xmlParser.document?.printAll();
   });
   test('dom test', () {
