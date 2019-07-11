@@ -35,6 +35,16 @@ class Element {
     _root.insertElementByTag(this);
   }
 
+  // 元素值
+  String _value;
+
+  get value => _value;
+
+  set value(String v) {
+    v = v?.trim();
+    _value = v;
+  }
+
   // 元素id
   String _id;
 

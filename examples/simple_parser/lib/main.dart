@@ -22,10 +22,20 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
-  void _onFrame(_){
-
+  Future<void> _loadHtml() async {
+    XmlParser xmlParser = XmlParser.html('''
+    <html>
+    <head>
+      <title>测试页面</title>
+    </head>
+    <body>
+      
+    </body>
+    </html>
+    ''');
   }
+
+  void _onFrame(_) {}
 
   @override
   void initState() {
@@ -35,6 +45,24 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('html'),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.refresh),
+        onPressed: () {},
+      ),
+      body: ListView.builder(
+        itemCount: 40,
+        physics: BouncingScrollPhysics(),
+        itemBuilder: (buildContext, index) {
+          return ListTile(
+            title: Text('title'),
+            subtitle: Text('sub'),
+          );
+        },
+      ),
+    );
   }
 }

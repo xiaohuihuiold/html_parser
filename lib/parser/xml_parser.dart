@@ -1,5 +1,4 @@
 import 'package:html_parser/exception/html_empty_exception.dart';
-import 'package:html_parser/exception/element_tag_null_exception.dart';
 import 'package:html_parser/html/document.dart';
 import 'package:html_parser/html/element.dart';
 
@@ -48,12 +47,15 @@ class XmlParser {
           if (element == null) {
             element = Element();
             i = _parseElementTag(element, ++i);
+            parent.addElement(element);
             if (_html[i] == ' ') {
               i = _parseAttributes(element, ++i);
               _parseElementID(element);
               _parseElementClass(element);
+              if (_html[i + 1] == '>') {
+                i = _parseElementValue(element, i + 2);
+              }
             }
-            parent.addElement(element);
           } else {
             // 发现新的element
             // TODO: 待处理script和style
@@ -155,6 +157,29 @@ class XmlParser {
     return i;
   }
 
+  /// 解析属性值
+  int _parseElementValue(Element element, int index) {
+    int i = index;
+    String value = '';
+    for (; i < _html.length; i++) {
+      String char = _html[i];
+      String charNext = () {
+        if (i + 1 < _html.length) {
+          return _html[i + 1];
+        }
+        return null;
+      }();
+      if (char == '<') {
+        value = value.trim();
+        element.value = value;
+        return i - 1;
+      } else {
+        value += char;
+      }
+    }
+    return i;
+  }
+
   /// 解析属性详细
   void _parseAttributesKV(Element element, String attr) {
     if (attr == null || attr.length == 0) return;
@@ -211,7 +236,7 @@ class XmlParser {
   /// 解析class
   void _parseElementClass(Element element) {
     List<String> classes =
-        (element.getAttribute('class') as String)?.split('\s+');
+        (element.getAttribute('class') as String)?.split(RegExp(r'\s+'));
     classes?.forEach((clazz) {
       element.addClass(clazz);
     });

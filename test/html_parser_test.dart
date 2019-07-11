@@ -263,11 +263,20 @@ String testHtml = '''
 ''';
 
 void main() {
+  test('http html parser', () {});
   test('html parser', () {
-    XmlParser xmlParser = XmlParser.html(File('examples/simple_parser/assets/test.html').readAsStringSync());
+    XmlParser xmlParser = XmlParser.html(
+        File('examples/simple_parser/assets/test.html').readAsStringSync());
     //XmlParser xmlParser = XmlParser.html(testHtml);
-    Document document=xmlParser.document;
-    document.printAll();
+    Document document = xmlParser.document;
+    List<Element> elements = document.getElementsByClass('list-item');
+    elements.forEach((ele) {
+      Element title=ele.getElementsByClass('title')[0].getElementsByTag('a')[0];
+      Element desc=ele.getElementsByClass('description')[0];
+      print('插件: ${title.value}');
+      print('描述: ${desc.value}');
+      print('');
+    });
   });
   test('dom test', () {
     XmlParser xmlParser = XmlParser.html(testHtml);
