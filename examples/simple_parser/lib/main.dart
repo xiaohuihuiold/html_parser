@@ -1,5 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:html_parser/html_parser.dart';
+import 'package:html_parser/html_parser.dart' hide Element;
+import 'package:html_parser/html/element.dart' as html;
 
 void main() => runApp(MyApp());
 
@@ -22,20 +24,31 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  List<Map<String, String>> plugins = List();
+
   Future<void> _loadHtml() async {
-    XmlParser xmlParser = XmlParser.html('''
-    <html>
-    <head>
-      <title>测试页面</title>
-    </head>
-    <body>
-      
-    </body>
-    </html>
-    ''');
+    Dio dio = Dio();
+    Response response = await dio.get('https://pub.flutter-io.cn/');
+    XmlParser xmlParser = XmlParser.html(response.data);
+    Document document = xmlParser.document;
+    List<html.Element> elements = document.getElementsByClass('list-item');
+    elements.forEach((ele) {
+      html.Element title =
+          ele.getElementsByClass('title')[0].getElementsByTag('a')[0];
+      html.Element desc = ele.getElementsByClass('description')[0];
+      plugins.add({
+        'title': title.value,
+        'desc': desc.value,
+      });
+    });
+    setState(() {
+      plugins = plugins;
+    });
   }
 
-  void _onFrame(_) {}
+  void _onFrame(_) {
+    _loadHtml();
+  }
 
   @override
   void initState() {
@@ -54,12 +67,16 @@ class _HomePageState extends State<HomePage> {
         onPressed: () {},
       ),
       body: ListView.builder(
-        itemCount: 40,
+        itemCount: plugins.length,
         physics: BouncingScrollPhysics(),
         itemBuilder: (buildContext, index) {
           return ListTile(
-            title: Text('title'),
-            subtitle: Text('sub'),
+            leading: Icon(Icons.extension),
+            title: Text(
+              plugins[index]['title'],
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            subtitle: Text(plugins[index]['desc']),
           );
         },
       ),
