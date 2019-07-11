@@ -23,9 +23,7 @@ class Element {
   get tag => _tag;
 
   set tag(String v) {
-    if (v != null) {
-      v = v.toLowerCase();
-    }
+    v = v?.toLowerCase()?.trim();
     if (_root == null) {
       _tag = v;
       return;
@@ -42,9 +40,9 @@ class Element {
 
   get id => _id;
 
-  set id(v) {
+  set id(String v) {
     if (_root == null) {
-      _id = v;
+      _id = v?.toLowerCase()?.trim();
       return;
     }
     if (_id != null) {
@@ -72,6 +70,7 @@ class Element {
   /// 添加class
   /// [clazz] 元素类名
   int addClass(String clazz) {
+    clazz = clazz?.toLowerCase()?.trim();
     if (clazz == null || clazz.length == 0) {
       return -1;
     }
@@ -90,6 +89,7 @@ class Element {
   /// 移除class
   /// [clazz] 元素类名
   int removeClass(String clazz) {
+    clazz = clazz?.toLowerCase();
     if (clazz == null ||
         clazz.length == 0 ||
         _classes == null ||
@@ -108,7 +108,8 @@ class Element {
   /// [name] 属性名
   /// [value] 值
   int putAttribute(String name, dynamic value) {
-    if (_attributes == null) {
+    name = name?.toLowerCase()?.trim();
+    if (_attributes == null || name == null) {
       _attributes = Map();
     }
     _attributes[name] = value;
@@ -118,7 +119,8 @@ class Element {
   /// 移除元素属性
   /// [name] 属性名
   int removeAttribute(String name) {
-    if (_attributes == null) {
+    name = name?.toLowerCase();
+    if (_attributes == null || name == null) {
       return -1;
     }
     _attributes.remove(name);
@@ -128,7 +130,8 @@ class Element {
   /// 查找元素属性
   /// [name] 属性名
   dynamic getAttribute(String name) {
-    if (_attributes == null) {
+    name = name?.toLowerCase();
+    if (_attributes == null || name == null) {
       return null;
     }
     return _attributes[name];
@@ -221,6 +224,7 @@ class Element {
     if (_root == null) {
       throw ElementRootNullException('根节点为空');
     }
+    id = id?.toLowerCase();
     return _root.getElementById(id);
   }
 
@@ -241,13 +245,14 @@ class Element {
   /// 根据class查找elements
   /// [clazz] 类名
   List<Element> getElementsByClass(String clazz) {
+    clazz = clazz?.toLowerCase();
     List<Element> elements = List();
     _elements?.forEach((element) {
       List<String> classes = element.classes;
       if (classes?.contains(clazz) ?? false) {
         elements.add(element);
       }
-      elements += element?.getElementsByClass(tag);
+      elements += element?.getElementsByClass(clazz);
     });
     return elements;
   }
@@ -268,7 +273,7 @@ class Element {
     String id = this._id == null ? '' : 'id:${this._id}';
     String clazz = this._classes == null
         ? ''
-        : '${id == null ? '' : ' '}class:${this._classes}';
+        : '${(id == null || id.isEmpty) ? '' : ' '}class:${this._classes}';
     String str;
     str = '($id$clazz)';
     if (id.isEmpty && clazz.isEmpty) {

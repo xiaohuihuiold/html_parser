@@ -48,8 +48,14 @@ class XmlParser {
           if (element == null) {
             element = Element();
             i = _parseElementTag(element, ++i);
+            if (_html[i] == ' ') {
+              i = _parseAttributes(element, ++i);
+              _parseElementID(element);
+              _parseElementClass(element);
+            }
             parent.addElement(element);
           } else {
+            // 发现新的element
             List<int> result = _parseElement(element, --i);
             i = result[0];
             if (result[1] > 0) {
@@ -121,5 +127,89 @@ class XmlParser {
     }
     element.tag = tag;
     return i;
+  }
+
+  /// 解析属性
+  /// 返回新的index
+  int _parseAttributes(Element element, int index) {
+    int i = index;
+    String attr = '';
+    for (; i < _html.length; i++) {
+      String char = _html[i];
+      String charNext = () {
+        if (i + 1 < _html.length) {
+          return _html[i + 1];
+        }
+        return null;
+      }();
+      if (char == '>' || (char == '/' && charNext == '>')) {
+        _parseAttributesKV(element, attr);
+        return i - 1;
+      }
+      attr += char;
+    }
+    return i;
+  }
+
+  /// 解析属性详细
+  void _parseAttributesKV(Element element, String attr) {
+    if (attr == null || attr.length == 0) return;
+    String mark = '';
+    String name = '';
+    String value = '';
+    for (int i = 0; i < attr.length; i++) {
+      String char = attr[i];
+      if (mark.isEmpty && char == ' ') {
+        continue;
+      }
+      if (name.isEmpty) {
+        for (; i < attr.length; i++) {
+          String char = attr[i];
+          if (char != '=') {
+            if (char == ' ') {
+              element.putAttribute(name, true);
+              name = '';
+              break;
+            }
+            name += char;
+          } else {
+            break;
+          }
+        }
+      } else {
+        for (; i < attr.length; i++) {
+          String char = attr[i];
+          if (char == '"' || char == "'") {
+            if (mark.isEmpty) {
+              mark = char;
+            } else {
+              mark = '';
+              element.putAttribute(name, value);
+              name = '';
+              value = '';
+              break;
+            }
+          } else {
+            if (mark.isNotEmpty) {
+              value += char;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /// 解析id
+  void _parseElementID(Element element) {
+    element.id = element.getAttribute('id');
+  }
+
+  /// 解析class
+  void _parseElementClass(Element element) {
+    List<String> classes =
+        (element.getAttribute('class') as String)?.split('\s+');
+    classes?.forEach((clazz) {
+      element.addClass(clazz);
+    });
   }
 }
