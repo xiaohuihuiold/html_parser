@@ -56,6 +56,10 @@ class XmlParser {
             parent.addElement(element);
           } else {
             // 发现新的element
+            // TODO: 待处理script
+            if(element.tag=='script'){
+              continue;
+            }
             List<int> result = _parseElement(element, --i);
             i = result[0];
             if (result[1] > 0) {

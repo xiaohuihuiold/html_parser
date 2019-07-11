@@ -267,9 +267,7 @@ void main() {
     XmlParser xmlParser = XmlParser.html(File('examples/simple_parser/assets/test.html').readAsStringSync());
     //XmlParser xmlParser = XmlParser.html(testHtml);
     Document document=xmlParser.document;
-    print(document.getElementById('id01'));
-    print(document.getElementsByClass('metadata'));
-    print(document.getElementsByTag('img'));
+    document.printAll();
   });
   test('dom test', () {
     XmlParser xmlParser = XmlParser.html(testHtml);
