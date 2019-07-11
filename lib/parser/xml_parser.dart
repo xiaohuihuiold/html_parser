@@ -56,8 +56,8 @@ class XmlParser {
             parent.addElement(element);
           } else {
             // 发现新的element
-            // TODO: 待处理script
-            if(element.tag=='script'){
+            // TODO: 待处理script和style
+            if (element.tag == 'script' || element.tag == 'style') {
               continue;
             }
             List<int> result = _parseElement(element, --i);
