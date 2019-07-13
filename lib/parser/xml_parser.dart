@@ -15,10 +15,12 @@ class XmlParser {
     _parse();
   }
 
+  /// 开始解析html
   void _parse() {
     if (_html == null || _html.length == 0) {
       throw HtmlEmptyException('html内容为空');
     }
+    // 创建文档以及根元素
     _document = Document();
     Element root = Element();
     root.tag = 'root';
@@ -45,16 +47,26 @@ class XmlParser {
         if (charNext != '/') {
           // 标签开始
           if (element == null) {
+            // 发现element
             element = Element();
             i = _parseElementTag(element, ++i);
-            parent.addElement(element);
-            if (_html[i] == ' ') {
-              i = _parseAttributes(element, ++i);
-              _parseElementID(element);
-              _parseElementClass(element);
-              if (_html[i + 1] == '>') {
-                i = _parseElementValue(element, i + 2);
+            if (!element.tag.toString().startsWith('!--')) {
+              // 如果不是注释就添加到子节点
+              parent.addElement(element);
+              if (_html[i] == ' ') {
+                // 标签后面如果是空格则说明可能有attribute
+                i = _parseAttributes(element, ++i);
+                // 解析完attribute后再获取id和class
+                _parseElementID(element);
+                _parseElementClass(element);
+                if (_html[i + 1] == '>') {
+                  // 解析element包裹的值,一般是文字
+                  i = _parseElementValue(element, i + 2);
+                }
               }
+            } else {
+              // 找到结束注释位置
+              return [_findHtmlNoteEndIndex(i), 0];
             }
           } else {
             // 发现新的element
@@ -62,8 +74,20 @@ class XmlParser {
             if (element.tag == 'script' || element.tag == 'style') {
               continue;
             }
-            List<int> result = _parseElement(element, --i);
+            Element temp = element;
+            // 不需要解析子节点的标签
+            switch (element.tag) {
+              case 'meta':
+              case 'link':
+              case 'img':
+                // 直接把新的element添加到当前element的父element
+                temp = parent;
+                break;
+            }
+            // 解析新的标签
+            List<int> result = _parseElement(temp, --i);
             i = result[0];
+            // 判断未闭合element跳过
             if (result[1] > 0) {
               result[1] = result[1] - 1;
               return result;
@@ -80,10 +104,12 @@ class XmlParser {
           // 计算需要跳过的次数
           int num = 0;
           Element temp = element;
+          // 查找最近的一个element计算跳过层数
           while (test.tag != temp.tag) {
             temp = temp.parent;
             num++;
             if (temp == null) {
+              // 已经到最顶层
               break;
             }
           }
@@ -91,6 +117,7 @@ class XmlParser {
         }
       } else if (char == '/') {
         if (charNext == '>') {
+          // 正常element结束
           return [++i, 0];
         }
       }
@@ -106,12 +133,16 @@ class XmlParser {
     for (; i < _html.length; i++) {
       String char = _html[i];
       if (char == ' ' || char == '/' || char == '>') {
+        // 标签名已经解析完成,需要进行下一步解析
         element.tag = tag;
         if (char == '/') {
+          // 这里是element正常结束
           return i - 1;
         }
+        // 可能还需要解析attribute
         return i;
       }
+      // 获取标签名
       tag += char;
     }
     element.tag = tag;
@@ -126,6 +157,7 @@ class XmlParser {
     for (; i < _html.length; i++) {
       String char = _html[i];
       if (char == '>') {
+        // 已经解析到标签末尾
         element.tag = tag;
         return i;
       }
@@ -149,9 +181,11 @@ class XmlParser {
         return null;
       }();
       if (char == '>' || (char == '/' && charNext == '>')) {
+        // 已经解析到标签末尾
         _parseAttributesKV(element, attr);
         return i - 1;
       }
+      // 获取的标签名到标签结束所有的值
       attr += char;
     }
     return i;
@@ -163,12 +197,6 @@ class XmlParser {
     String value = '';
     for (; i < _html.length; i++) {
       String char = _html[i];
-      String charNext = () {
-        if (i + 1 < _html.length) {
-          return _html[i + 1];
-        }
-        return null;
-      }();
       if (char == '<') {
         value = value.trim();
         element.value = value;
@@ -183,19 +211,26 @@ class XmlParser {
   /// 解析属性详细
   void _parseAttributesKV(Element element, String attr) {
     if (attr == null || attr.length == 0) return;
+    // 单引号或者双引号
     String mark = '';
     String name = '';
     String value = '';
     for (int i = 0; i < attr.length; i++) {
       String char = attr[i];
+      // 过滤多个attribute之间的空格
       if (mark.isEmpty && char == ' ') {
         continue;
       }
       if (name.isEmpty) {
+        // 最先开始解析的是name
         for (; i < attr.length; i++) {
           String char = attr[i];
+          // TODO: 需要优化等号前排除多个空格
           if (char != '=') {
+            // 如果没有等号
             if (char == ' ') {
+              // 并且是下一个元素开始
+              // 则说明当前attribute代表true
               element.putAttribute(name, true);
               name = '';
               break;
@@ -206,12 +241,17 @@ class XmlParser {
           }
         }
       } else {
+        // 此时name已经解析出来了
         for (; i < attr.length; i++) {
           String char = attr[i];
           if (char == '"' || char == "'") {
+            // value通常是单引号或者双引号开始和结束
             if (mark.isEmpty) {
+              // 记录value是单引号还是双引号
               mark = char;
             } else {
+              // mark不为空并且当前是单引号或者双引号
+              // 则说明当前value解析完成
               mark = '';
               element.putAttribute(name, value);
               name = '';
@@ -220,6 +260,7 @@ class XmlParser {
             }
           } else {
             if (mark.isNotEmpty) {
+              // 被引号包裹的value
               value += char;
             }
           }
@@ -235,10 +276,30 @@ class XmlParser {
 
   /// 解析class
   void _parseElementClass(Element element) {
+    // class按照一个或者多个空格分开
     List<String> classes =
         (element.getAttribute('class') as String)?.split(RegExp(r'\s+'));
     classes?.forEach((clazz) {
       element.addClass(clazz);
     });
+  }
+
+  /// 找出html注释结束位置
+  int _findHtmlNoteEndIndex(int index) {
+    int i = index;
+    while (true) {
+      String char = _html[i];
+      String charNext = () {
+        if (i + 1 < _html.length) {
+          return _html[i + 1];
+        }
+        return null;
+      }();
+      i++;
+      if (char == '-' && charNext == '>') {
+        // 注释结束,找到跳过之后的下标
+        return i;
+      }
+    }
   }
 }

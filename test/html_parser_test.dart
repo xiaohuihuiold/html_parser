@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:html_parser/html/document.dart';
 import 'package:html_parser/html/element.dart';
@@ -269,14 +268,7 @@ void main() {
         File('examples/simple_parser/assets/test.html').readAsStringSync());
     //XmlParser xmlParser = XmlParser.html(testHtml);
     Document document = xmlParser.document;
-    List<Element> elements = document.getElementsByClass('list-item');
-    elements.forEach((ele) {
-      Element title=ele.getElementsByClass('title')[0].getElementsByTag('a')[0];
-      Element desc=ele.getElementsByClass('description')[0];
-      print('插件: ${title.value}');
-      print('描述: ${desc.value}');
-      print('');
-    });
+    document.printAll();
   });
   test('dom test', () {
     XmlParser xmlParser = XmlParser.html(testHtml);
