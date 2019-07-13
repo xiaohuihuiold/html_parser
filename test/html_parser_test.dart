@@ -268,6 +268,7 @@ void main() {
         File('examples/simple_parser/assets/test.html').readAsStringSync());
     //XmlParser xmlParser = XmlParser.html(testHtml);
     Document document = xmlParser.document;
+    print('网站:${document.getTitle() ?? '未知'}');
     document.printAll();
   });
   test('dom test', () {

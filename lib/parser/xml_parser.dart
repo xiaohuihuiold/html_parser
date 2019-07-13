@@ -59,10 +59,10 @@ class XmlParser {
                 // 解析完attribute后再获取id和class
                 _parseElementID(element);
                 _parseElementClass(element);
-                if (_html[i + 1] == '>') {
-                  // 解析element包裹的值,一般是文字
-                  i = _parseElementValue(element, i + 2);
-                }
+              }
+              if (_html[i - 1] != '/' && _html[i] == '>') {
+                // 解析element包裹的值,一般是文字
+                i = _parseElementValue(element, i + 1);
               }
             } else {
               // 找到结束注释位置
@@ -183,7 +183,7 @@ class XmlParser {
       if (char == '>' || (char == '/' && charNext == '>')) {
         // 已经解析到标签末尾
         _parseAttributesKV(element, attr);
-        return i - 1;
+        return i + ((char == '/' && charNext == '>') ? 1 : 0);
       }
       // 获取的标签名到标签结束所有的值
       attr += char;
@@ -195,11 +195,12 @@ class XmlParser {
   int _parseElementValue(Element element, int index) {
     int i = index;
     String value = '';
+    print(element);
     for (; i < _html.length; i++) {
       String char = _html[i];
       if (char == '<') {
         value = value.trim();
-        element.value = value;
+        element.value = value.isEmpty ? null : value;
         return i - 1;
       } else {
         value += char;

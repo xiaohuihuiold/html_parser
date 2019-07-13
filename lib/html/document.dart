@@ -22,6 +22,15 @@ class Document {
   // 文档所有class元素
   Map<String, List<Element>> _elementsByClass;
 
+  /// 获取网页标题
+  String getTitle() {
+    List<Element> titles = getElementsByTag('title');
+    if ((titles?.length ?? 0) > 0) {
+      return titles[0].value;
+    }
+    return null;
+  }
+
   /// 根据tag插入
   /// [tag] 元素标签名
   /// [element] 元素
