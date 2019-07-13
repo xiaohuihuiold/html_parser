@@ -77,6 +77,11 @@ class Element {
 
   get attributes => _attributes;
 
+  // 是否有闭合标签
+  bool _close=true;
+  get close=>_close;
+  set close(v)=>_close=v;
+
   /// 添加class
   /// [clazz] 元素类名
   int addClass(String clazz) {

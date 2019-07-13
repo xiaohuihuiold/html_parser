@@ -105,15 +105,24 @@ class XmlParser {
           int num = 0;
           Element temp = element;
           // 查找最近的一个element计算跳过层数
-          while (test.tag != temp.tag) {
+          while (test.tag != temp.tag && !temp.close) {
+            if (num == 0) {
+              num++;
+            } else {
+              if (!temp.close) {
+                num++;
+              }
+            }
             temp = temp.parent;
-            num++;
             if (temp == null) {
               // 已经到最顶层
               break;
             }
           }
-          return [i, 0];
+          if (num > 0) {
+            element.close = false;
+          }
+          return [i, num];
         }
       } else if (char == '/') {
         if (charNext == '>') {
