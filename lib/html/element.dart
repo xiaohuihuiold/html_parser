@@ -78,7 +78,7 @@ class Element {
   get attributes => _attributes;
 
   // 是否有闭合标签
-  bool _close=true;
+  bool _close=false;
   get close=>_close;
   set close(v)=>_close=v;
 

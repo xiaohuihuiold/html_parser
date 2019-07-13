@@ -32,7 +32,7 @@ class XmlParser {
   /// [parent] 父element
   /// [index] html下标
   /// 返回[下标,状态]
-  List<int> _parseElement(Element parent, int index) {
+  List _parseElement(Element parent, int index) {
     int i = index;
     Element element;
     for (; i < _html.length; i++) {
@@ -52,6 +52,9 @@ class XmlParser {
             i = _parseElementTag(element, ++i);
             if (!element.tag.toString().startsWith('!--')) {
               // 如果不是注释就添加到子节点
+              if (element.tag == 'main') {
+                print(parent);
+              }
               parent.addElement(element);
               if (_html[i] == ' ') {
                 // 标签后面如果是空格则说明可能有attribute
@@ -66,7 +69,7 @@ class XmlParser {
               }
             } else {
               // 找到结束注释位置
-              return [_findHtmlNoteEndIndex(i), 0];
+              return [_findHtmlNoteEndIndex(i), null];
             }
           } else {
             // 发现新的element
@@ -85,13 +88,10 @@ class XmlParser {
                 break;
             }
             // 解析新的标签
-            List<int> result = _parseElement(temp, --i);
+            List result = _parseElement(temp, --i);
             i = result[0];
             // 判断未闭合element跳过
-            if (result[1] > 0) {
-              result[1] = result[1] - 1;
-              return result;
-            }
+            element = result[1] ?? element;
             continue;
           }
         } else if (charNext == '/') {
@@ -102,36 +102,28 @@ class XmlParser {
           i++;
           i = _parseElementCloseTag(test, i);
           // 计算需要跳过的次数
-          int num = 0;
           Element temp = element;
+          if (test.tag == element.tag) {
+            element.close = true;
+            return [i, null];
+          }
           // 查找最近的一个element计算跳过层数
-          while (test.tag != temp.tag && !temp.close) {
-            if (num == 0) {
-              num++;
-            } else {
-              if (!temp.close) {
-                num++;
-              }
-            }
+          while (test.tag != temp.tag) {
             temp = temp.parent;
-            if (temp == null) {
-              // 已经到最顶层
+            if (temp == null || (test.tag == temp.tag)) {
               break;
             }
           }
-          if (num > 0) {
-            element.close = false;
-          }
-          return [i, num];
+          return [i, temp?.parent];
         }
       } else if (char == '/') {
         if (charNext == '>') {
           // 正常element结束
-          return [++i, 0];
+          return [++i, null];
         }
       }
     }
-    return [i, 0];
+    return [i, null];
   }
 
   /// 解析出tag名
