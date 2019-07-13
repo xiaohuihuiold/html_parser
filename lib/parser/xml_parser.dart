@@ -113,7 +113,7 @@ class XmlParser {
               break;
             }
           }
-          return [i, num];
+          return [i, 0];
         }
       } else if (char == '/') {
         if (charNext == '>') {
@@ -195,7 +195,6 @@ class XmlParser {
   int _parseElementValue(Element element, int index) {
     int i = index;
     String value = '';
-    print(element);
     for (; i < _html.length; i++) {
       String char = _html[i];
       if (char == '<') {

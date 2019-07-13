@@ -264,9 +264,9 @@ String testHtml = '''
 void main() {
   test('http html parser', () {});
   test('html parser', () {
-    XmlParser xmlParser = XmlParser.html(
-        File('examples/simple_parser/assets/test.html').readAsStringSync());
-    //XmlParser xmlParser = XmlParser.html(testHtml);
+    //XmlParser xmlParser = XmlParser.html(
+    //    File('examples/simple_parser/assets/test.html').readAsStringSync());
+    XmlParser xmlParser = XmlParser.html(testHtml);
     Document document = xmlParser.document;
     print('网站:${document.getTitle() ?? '未知'}');
     document.printAll();

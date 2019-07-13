@@ -289,6 +289,6 @@ class Element {
     if (id.isEmpty && clazz.isEmpty) {
       str = '';
     }
-    return '$tag $str';
+    return '$tag $str $value';
   }
 }
